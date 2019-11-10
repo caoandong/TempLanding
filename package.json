@@ -1,0 +1,22 @@
+{
+  "name": "telex_robotics",
+  "version": "1.0.0",
+  "description": "The main website for TeleX Robotics",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caoandong/TeleX_Robotics_Site.git"
+  },
+  "keywords": [
+    "TeleXRobotics"
+  ],
+  "author": "Antonio Cao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caoandong/TeleX_Robotics_Site/issues"
+  },
+  "homepage": "https://github.com/caoandong/TeleX_Robotics_Site#readme"
+}
