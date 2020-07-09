@@ -1,0 +1,22 @@
+sudo: required
+services:
+    - docker
+language: generic
+
+before_install:
+    - docker build -t antonio/telex-landing -f Dockerfile.dev .
+
+script:
+    - docker run -e CI=true antonio/telex-landing npm run build
+
+deploy:
+    provider: elasticbeanstalk
+    region: "us-east-2"
+    app: "TeleXLadning"
+    env: "Telexladning-env"
+    bucket_name: "elasticbeanstalk-us-east-2-774948942702"
+    bucket_path: "TeleXLadning"
+    on:
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
