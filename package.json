@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev-build": "webpack --watch --mode development",
     "dev-run": "nodemon server.js",
-    "build": "webpack && node server.js"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
