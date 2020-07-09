@@ -1,0 +1,29 @@
+#texts {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    align-items: center;
+
+    position: absolute;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+
+#title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 200;
+    font-size: 5em;
+}
+
+#subtitle {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 2em;
+    margin-top: 0.5em;
+}

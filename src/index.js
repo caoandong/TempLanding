@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import './index.css';
 const SimplexNoise = require('simplex-noise');
 
 // basic controls
@@ -7,23 +8,24 @@ const simplex = new SimplexNoise(Math.random);
 const container = document.getElementById('container');
 const mouse = new THREE.Vector2();
 const intersect = new THREE.Vector3();
+const cameraAngleRange = 0.5;
+const cameraRadius = 5;
 
 
-const slowdownFactor = 8;
+const slowdownFactor = 2;
 const numIncrements = 100 * slowdownFactor;
 
-let speed = 10;
-let targetSpeed = speed;
-const minSpeed = 10;
-const speedScale = 50.0 / numIncrements;
+const speed = 12;
+const complexity = 1.5;
+
 let spikeSize = 20;
 const minSpikeSize = 0.05;
 const spikeSizeScale = 2.0 / numIncrements;
 let targetSpikeSize = spikeSize;
-let complexity = 70;
-const minComplexity = 0.6;
-const complexityScale = 1.8 / numIncrements;
-let targetComplexity = complexity;
+
+let magnitude = 30;
+const magnitudeScale = 1.0 / numIncrements;
+let targetMagnitude = magnitude;
 
 
 window.onload = () => {
@@ -52,26 +54,28 @@ function initScene() {
         0.1,
         1000,
     );
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 0, cameraRadius);
     camera.updateMatrix();
 
     raycaster = new THREE.Raycaster();
 
     window.addEventListener('resize', onWindowResize, false);
 
-    container.onmousemove = (event) => {
+    window.onpointermove = (event) => {
         mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
         mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        const angle = mouse.x * cameraAngleRange;
+        camera.position.z = cameraRadius * Math.cos(angle);
+        camera.position.x = cameraRadius * Math.sin(angle);
+        camera.rotation.y = angle;
         raycaster.setFromCamera(mouse, camera);
         sphere.geometry.computeBoundingSphere();
         if (raycaster.ray.intersectSphere(sphere.geometry.boundingSphere, intersect)) {
-            targetSpeed = 20 * slowdownFactor;
-            targetSpikeSize = 35 * slowdownFactor;
-            targetComplexity = 70 * slowdownFactor;
+            targetSpikeSize = 30 * slowdownFactor;
+            targetMagnitude = 38 * slowdownFactor;
         } else {
-            targetSpeed = 10 * slowdownFactor;
             targetSpikeSize = 20 * slowdownFactor;
-            targetComplexity = 50 * slowdownFactor;
+            targetMagnitude = 30 * slowdownFactor;
         }
     };
 
@@ -87,25 +91,20 @@ function render() {
 }
 
 function updateTargetValues() {
-    if (speed != targetSpeed) {
-        if (speed > targetSpeed) {
-            speed > targetSpeed ? speed -= 1 : speed += 1;
-        }
-    }
     if (spikeSize != targetSpikeSize) {
         spikeSize > targetSpikeSize ? spikeSize -= 1 : spikeSize += 1;
     }
-    if (complexity != targetComplexity) {
-        complexity > targetComplexity ? complexity -= 1 : complexity += 1;
+    if (magnitude != targetMagnitude) {
+        magnitude > targetMagnitude ? magnitude -= 1 : magnitude += 1;
     }
 }
-
 
 function createBlob() {
     const geometry = new THREE.SphereGeometry(.8, 128, 128);
     const material = new THREE.MeshPhongMaterial({
         color: 0xE4ECFA,
-        shininess: 100,
+        specular: 0xffffff,
+        shininess: 2000,
     });
 
     const lightTop = new THREE.DirectionalLight(0xFFFFFF, .7);
@@ -122,20 +121,22 @@ function createBlob() {
     scene.add(ambientLight);
 
     sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 0;
+    sphere.position.y = 0;
+    sphere.position.z = 0;
 
     scene.add(sphere);
 }
 
 function updateSphereNoise() {
-    const speedScaled = speed * speedScale + minSpeed;
     const spikeSizeScaled = spikeSize * spikeSizeScale + minSpikeSize;
-    const complexityScaled = complexity * complexityScale + minComplexity;
-    const time = performance.now() * 0.00001 * speedScaled * Math.pow(complexityScaled, 3);
-    const spikes = spikeSizeScaled * complexityScaled;
+    const magnitudeScaled = magnitude * magnitudeScale;
+    const time = performance.now() * 0.00001 * speed * Math.pow(complexity, 3);
+    const spikes = spikeSizeScaled * complexity;
 
     for (let i = 0; i < sphere.geometry.vertices.length; i++) {
         const p = sphere.geometry.vertices[i];
-        p.normalize().multiplyScalar(1 + 0.3 * simplex.noise3D(p.x * spikes, p.y * spikes, p.z * spikes + time));
+        p.normalize().multiplyScalar(1 + magnitudeScaled * simplex.noise3D(p.x * spikes, p.y * spikes, p.z * spikes + time));
     }
 
     sphere.geometry.computeVertexNormals();
